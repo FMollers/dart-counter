@@ -11,7 +11,7 @@ import {
 } from '@/context/games-context';
 import { Player } from '@/context/players-context';
 import { cn } from '@/lib/utils';
-import { CircleSlash2, Crosshair, Undo } from 'lucide-react';
+import { CircleSlash2, Crosshair, Tally5, Undo } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface GameClientProps {
@@ -20,7 +20,7 @@ interface GameClientProps {
 
 const GameClient = ({ game }: GameClientProps) => {
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
-  const { state, dispatch } = useGamesContext();
+  const { dispatch } = useGamesContext();
 
   const calculateThrowScore = (
     throwValue: number,
@@ -153,12 +153,11 @@ const GameClient = ({ game }: GameClientProps) => {
     return nextPlayer;
   };
 
-  const calculateAveragePoints = (throws: DartThrow[]): number => {
-    //FIX TO MANY DECIMALS SHOWING AND INCLUDE TURNHISTORY
+  const calculateAveragePoints = (throws: DartThrow[]): string => {
     const validThrows = throws.filter((dartThrow) => dartThrow.score > 0);
 
     if (validThrows.length === 0) {
-      return 0;
+      return '0';
     }
 
     const totalPoints = validThrows.reduce(
@@ -167,7 +166,7 @@ const GameClient = ({ game }: GameClientProps) => {
     );
     const average = totalPoints / validThrows.length;
 
-    return average;
+    return average.toFixed(2);
   };
 
   const calculateTotalDartsThrown = (
@@ -204,7 +203,6 @@ const GameClient = ({ game }: GameClientProps) => {
   return (
     <>
       <div className="w-full p-2 grid gap-4 py-4">
-        {game.status}
         {game.players.map((player) => (
           <Card
             key={player.id}
@@ -263,6 +261,7 @@ const GameClient = ({ game }: GameClientProps) => {
               <div className="grid grid-rows-3 gap-2 items-center">
                 <div className="flex justify-end">
                   {player.legsWon}/{game.legsToWin}
+                  <Tally5 className="ml-2" />
                 </div>
                 <div className="flex justify-end">
                   {calculateAveragePoints(player.currentTurn)}

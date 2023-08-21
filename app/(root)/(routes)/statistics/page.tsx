@@ -46,9 +46,7 @@ const StatisticsPage = () => {
               >
                 {game.players.map((player) => (
                   <div key={player.id} className="grid grid-cols-5">
-                    <div>
-                      <p>{player.name}</p>
-                    </div>
+                    <p>{player.name}</p>
                     <p>{player.score}</p>
                     <p>
                       {player.legsWon}/{game.legsToWin}

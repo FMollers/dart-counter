@@ -1,7 +1,14 @@
+'use client';
+
+import PlayerList from '@/components/ui/player-list';
+import { usePlayersContext } from '@/context/players-context';
+
 const PlayersPage = () => {
+  const { state, dispatch } = usePlayersContext();
+
   return (
-    <div className="h-full p-4 space-y-2">
-      <div>Players Page</div>
+    <div className="p-4 flex justify-center">
+      <PlayerList />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 'use client';
 
-import { Keyboard } from 'lucide-react';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 
 export const Navbar = () => {

@@ -12,7 +12,7 @@ export const Footer = () => {
     {
       icon: Home,
       href: '/',
-      label: 'Game',
+      label: 'Home',
       color: 'text-green-500',
     },
     {
@@ -43,7 +43,7 @@ export const Footer = () => {
             onClick={() => router.push(route.href)}
             key={route.href}
             className={cn(
-              'text-muted-foreground text-xs group flex md:p-3 w-full justify-center font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition',
+              'text-muted-foreground text-xs group flex p-3 w-full justify-center font-medium cursor-pointer hover:text-primary hover:bg-primary/10 rounded-lg transition',
               pathName === route.href && 'bg-primary/10 text-primary'
             )}
           >

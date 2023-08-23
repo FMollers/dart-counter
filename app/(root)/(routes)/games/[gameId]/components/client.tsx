@@ -3,6 +3,17 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+
+import {
+  ArrowLeftRight,
+  CircleSlash2,
+  Crosshair,
+  Keyboard,
+  Tally5,
+} from 'lucide-react';
+
+import { cn } from '@/lib/utils';
+
 import {
   DartThrow,
   Game,
@@ -10,16 +21,30 @@ import {
   useGamesContext,
 } from '@/context/games-context';
 import { Player } from '@/context/players-context';
-import { cn } from '@/lib/utils';
-import { CircleSlash2, Crosshair, Tally5, Undo } from 'lucide-react';
+
 import { useEffect, useState } from 'react';
+import StandardKeyboard from '@/components/keyboards/standard-keyboard';
+import AdvancedKeyboard from '@/components/keyboards/advanced-keyboard';
 
 interface GameClientProps {
   game: Game;
 }
 
+//MOVE TO ENUM FOLDER?
+enum KeyboardTypes {
+  STANDARD = 'STANDARD',
+  ADVANCED = 'ADVANCED',
+}
+
 const GameClient = ({ game }: GameClientProps) => {
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
+  const [winner, setWinner] = useState<Player>();
+
+  //TODO: WHEN SWITCHING KEYBOARD, CLEAR STATE
+  const [keyboardType, setKeyboardType] = useState<KeyboardTypes>(
+    KeyboardTypes.ADVANCED
+  );
+
   const { dispatch } = useGamesContext();
 
   const calculateThrowScore = (
@@ -36,6 +61,8 @@ const GameClient = ({ game }: GameClientProps) => {
     );
 
     if (currentPlayer) {
+      //HANDLE DOUBLE OUT SCENARIO
+
       const dartThrow: DartThrow = {
         score,
         multiplier,
@@ -102,7 +129,7 @@ const GameClient = ({ game }: GameClientProps) => {
     if (currentPlayer) {
       const lastThrowScore = currentPlayer.currentTurn.at(-1)?.score;
 
-      if (lastThrowScore) {
+      if (lastThrowScore !== undefined) {
         dispatch({
           type: GameActionTypes.UNDO_THROWS,
           payload: {
@@ -194,281 +221,172 @@ const GameClient = ({ game }: GameClientProps) => {
     setMultiplier((prev) => (prev === multiplier ? 1 : multiplier));
   };
 
+  const handleKeyboardSwitch = () => {
+    setMultiplier(1);
+    setKeyboardType((prev) =>
+      prev === KeyboardTypes.ADVANCED
+        ? KeyboardTypes.STANDARD
+        : KeyboardTypes.ADVANCED
+    );
+  };
+
   useEffect(() => {
     if (game.status === 'completed') {
-      console.log(game.status);
+      const dartWinner = game.players.find(
+        (player) => player.legsWon === game.legsToWin
+      );
+      if (dartWinner) {
+        setWinner(dartWinner);
+      }
     }
   }, [game.status]);
 
   return (
-    <>
-      <div className="w-full p-2 grid gap-4 py-4">
-        {game.players.map((player) => (
-          <Card
-            key={player.id}
-            className={cn(
-              'w-full border-l-8',
-              game.currentPlayerId === player.id
-                ? 'border-l-green-500'
-                : 'border-l-primary'
-            )}
-          >
+    <div>
+      {winner ? (
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <h1 className="flex justify-center text-2xl">WINNER</h1>
+          <Card>
             <CardContent className="pt-6 grid grid-cols-3 gap-4">
               <div>
                 <div
                   className={cn(
                     'text-3xl',
-                    player.score <= 170 && 'text-green-500'
+                    winner.score <= 170 && 'text-green-500'
                   )}
                 >
-                  {player.score < 0 ? 0 : player.score}
+                  {winner.score < 0 ? 0 : winner.score}
                 </div>
-                <div className="overflow-hidden">{player.name}</div>
-                <Badge className="overflow-hidden">{player.initialScore}</Badge>
+                <div className="overflow-hidden">{winner.name}</div>
+                <Badge className="overflow-hidden">{winner.initialScore}</Badge>
               </div>
-              <div className="grid grid-cols-3 gap-6 items-center">
-                {player.currentTurn.length ? (
-                  player.currentTurn.map((turn, index) => (
-                    <Button
-                      key={index}
-                      disabled
-                      variant="secondary"
-                      className={cn(
-                        'flex justify-center items-center',
-                        player.currentTurn.some((turn) => turn.isBust)
-                          ? 'bg-red-400'
-                          : ''
-                      )}
-                    >
-                      {turn.score}
-                    </Button>
-                  ))
-                ) : (
-                  <>
-                    <Button disabled variant="secondary"></Button>
-                    <Button disabled variant="secondary"></Button>
-                    <Button disabled variant="secondary"></Button>
-                  </>
-                )}
-                <Button
-                  disabled
-                  variant="ghost"
-                  className="col-span-3 flex justify-center"
-                >
-                  {calculateCurrentTurnPoints(player.currentTurn)}
-                </Button>
+              <div className="flex justify-center items-center text-3xl">
+                {winner.checkoutType}
               </div>
               <div className="grid grid-rows-3 gap-2 items-center">
                 <div className="flex justify-end">
-                  {player.legsWon}/{game.legsToWin}
+                  {winner.legsWon}/{game.legsToWin}
                   <Tally5 className="ml-2" />
                 </div>
                 <div className="flex justify-end">
-                  {calculateAveragePoints(player.currentTurn)}
+                  {calculateAveragePoints(winner.currentTurn)}
                   <CircleSlash2 className="ml-2" />
                 </div>
                 <div className="flex justify-end">
                   {calculateTotalDartsThrown(
-                    player.currentTurn,
-                    player.turnHistory
+                    winner.currentTurn,
+                    winner.turnHistory
                   )}
                   <Crosshair className="ml-2" />
                 </div>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
-      <div className="fixed w-full md:bottom-20 md:p-2 bottom-16 p-2 bg-secondary">
-        <div className="grid grid-cols-7 gap-4">
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(1)}
-          >
-            1
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(2)}
-          >
-            2
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(3)}
-          >
-            3
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(4)}
-          >
-            4
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(5)}
-          >
-            5
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(6)}
-          >
-            6
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(7)}
-          >
-            7
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(8)}
-          >
-            8
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(9)}
-          >
-            9
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(10)}
-          >
-            10
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(11)}
-          >
-            11
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(12)}
-          >
-            12
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(13)}
-          >
-            13
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(14)}
-          >
-            14
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(15)}
-          >
-            15
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(16)}
-          >
-            16
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(17)}
-          >
-            17
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(18)}
-          >
-            18
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(19)}
-          >
-            19
-          </Button>
-          <Button
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(20)}
-          >
-            20
-          </Button>
-          <Button
-            disabled={multiplier !== 1}
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(25)}
-          >
-            25
-          </Button>
-          <Button
-            disabled={multiplier !== 1}
-            variant="default"
-            className="col-span-1"
-            onClick={() => makeThrow(0)}
-          >
-            0
-          </Button>
-          <Button
-            className={cn(
-              'col-span-2 text-white px-5',
-              multiplier === 2
-                ? 'bg-green-500 hover:bg-green-300'
-                : 'bg-yellow-500 hover:bg-yellow-400'
-            )}
-            onClick={() => handleMultiplier(2)}
-          >
-            DOUBLE
-          </Button>
-          <Button
-            className={cn(
-              'col-span-2 text-white',
-              multiplier === 3
-                ? 'bg-green-500 hover:bg-green-300'
-                : 'bg-orange-400 hover:bg-orange-500'
-            )}
-            onClick={() => handleMultiplier(3)}
-          >
-            TRIPPLE
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={undoThrows}
-            className="col-span-2 text-xl"
-          >
-            <Undo />
-          </Button>
         </div>
-      </div>
-    </>
+      ) : (
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 p-4 mb-72">
+          {game.players.map((player) => (
+            <Card
+              key={player.id}
+              className={cn(
+                'w-full border-l-8',
+                game.currentPlayerId === player.id
+                  ? 'border-l-green-500'
+                  : 'border-l-primary'
+              )}
+            >
+              <CardContent className="pt-6 grid grid-cols-3 gap-4">
+                <div>
+                  <div
+                    className={cn(
+                      'text-3xl',
+                      player.score <= 170 && 'text-green-500'
+                    )}
+                  >
+                    {player.score < 0 ? 0 : player.score}
+                  </div>
+                  <div className="overflow-hidden">{player.name}</div>
+                  <Badge className="overflow-hidden">
+                    {player.checkoutType}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-3 gap-6 items-center">
+                  {player.currentTurn.length ? (
+                    player.currentTurn.map((turn, index) => (
+                      <Button
+                        key={index}
+                        disabled
+                        variant="secondary"
+                        className={cn(
+                          'flex justify-center items-center',
+                          player.currentTurn.some((turn) => turn.isBust)
+                            ? 'bg-red-400'
+                            : ''
+                        )}
+                      >
+                        {turn.score}
+                      </Button>
+                    ))
+                  ) : (
+                    <>
+                      <Button disabled variant="secondary"></Button>
+                      <Button disabled variant="secondary"></Button>
+                      <Button disabled variant="secondary"></Button>
+                    </>
+                  )}
+                  <Button
+                    disabled
+                    variant="ghost"
+                    className="col-span-3 flex justify-center"
+                  >
+                    {calculateCurrentTurnPoints(player.currentTurn)}
+                  </Button>
+                </div>
+                <div className="grid grid-rows-3 gap-2 items-center">
+                  <div className="flex justify-end">
+                    {player.legsWon}/{game.legsToWin}
+                    <Tally5 className="ml-2" />
+                  </div>
+                  <div className="flex justify-end">
+                    {calculateAveragePoints(player.currentTurn)}
+                    <CircleSlash2 className="ml-2" />
+                  </div>
+                  <div className="flex justify-end">
+                    {calculateTotalDartsThrown(
+                      player.currentTurn,
+                      player.turnHistory
+                    )}
+                    <Crosshair className="ml-2" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+      <Button
+        onClick={handleKeyboardSwitch}
+        variant="secondary"
+        className="fixed bottom-60 right-0 z-50 p-6 rounded-b-none rounded-r-none hover:text-secondary hover:bg-primary"
+      >
+        <ArrowLeftRight />
+        <Keyboard />
+      </Button>
+      {keyboardType === KeyboardTypes.STANDARD ? (
+        <StandardKeyboard
+          multiplier={multiplier}
+          makeThrow={makeThrow}
+          undoThrows={undoThrows}
+        />
+      ) : (
+        <AdvancedKeyboard
+          multiplier={multiplier}
+          handleMultiplier={handleMultiplier}
+          makeThrow={makeThrow}
+          undoThrows={undoThrows}
+        />
+      )}
+    </div>
   );
 };
 

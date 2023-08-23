@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useReducer, useContext } from 'react';
-import { Player } from './players-context';
+import { CheckoutTypes, Player } from './players-context';
 
 export type Game = {
   id: string;
@@ -17,12 +17,89 @@ export type DartThrow = {
   isBust: boolean;
 };
 
-export type GamesState = {
+type GamesState = {
   games: Game[];
 };
 
 const initialState: GamesState = {
-  games: [],
+  games: [
+    {
+      id: 'g2a1aa3t-d2d6-450d-2iau-0y072b54b321',
+      currentPlayerId: 'f7a1dd3f-d2d6-450d-9aea-5f074a54b750',
+      legsToWin: 3,
+      status: 'completed',
+      players: [
+        {
+          id: 'f7a1dd3f-d2d6-450d-9aea-5f074a54b750',
+          name: 'Filip',
+          checkoutType: CheckoutTypes.STRAIGHT_OUT,
+          currentTurn: [],
+          legsWon: 3,
+          score: 0,
+          initialScore: 401,
+          turnHistory: [],
+        },
+        {
+          id: '49b9b576-2987-41a3-bc5a-fe5b4a4f1ddb',
+          name: 'Kalle',
+          checkoutType: CheckoutTypes.DOUBLE_OUT,
+          currentTurn: [],
+          legsWon: 0,
+          score: 501,
+          initialScore: 501,
+          turnHistory: [],
+        },
+        {
+          id: '87b3b912-8321-42y3-bt5i-fe3b4a4f1ddb',
+          name: 'Emma',
+          checkoutType: CheckoutTypes.STRAIGHT_OUT,
+          currentTurn: [],
+          legsWon: 0,
+          score: 301,
+          initialScore: 301,
+          turnHistory: [],
+        },
+      ],
+    },
+    {
+      id: '37e29b7b-a4a8-4791-a34c-e8a57fe45112',
+      currentPlayerId: '87b3b912-8321-42y3-bt5i-fe3b4a4f1ddb',
+      legsToWin: 2,
+      status: 'in progress',
+      players: [
+        {
+          id: 'f7a1dd3f-d2d6-450d-9aea-5f074a54b750',
+          name: 'Filip',
+          checkoutType: CheckoutTypes.STRAIGHT_OUT,
+          currentTurn: [],
+          legsWon: 0,
+          score: 401,
+          initialScore: 401,
+          turnHistory: [],
+        },
+        {
+          id: '49b9b576-2987-41a3-bc5a-fe5b4a4f1ddb',
+          name: 'Kalle',
+          checkoutType: CheckoutTypes.DOUBLE_OUT,
+          currentTurn: [],
+          legsWon: 2,
+          score: 12,
+          initialScore: 501,
+          turnHistory: [],
+        },
+        {
+          id: '87b3b912-8321-42y3-bt5i-fe3b4a4f1ddb',
+          name: 'Emma',
+          checkoutType: CheckoutTypes.STRAIGHT_OUT,
+          currentTurn: [],
+          legsWon: 0,
+          score: 301,
+          initialScore: 301,
+          turnHistory: [],
+        },
+      ],
+    },
+  ],
 };
 
 export enum GameActionTypes {
@@ -248,22 +325,26 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
                 ...game,
                 status: action.payload.gameStatus,
                 currentPlayerId: game.players[0].id,
-                players: game.players.map((player) =>
-                  player.id === action.payload.roundWinnerId
-                    ? {
-                        ...player,
-                        currentTurn: [],
-                        turnHistory: [],
-                        score: player.initialScore,
-                        legsWon: player.legsWon + 1,
-                      }
-                    : {
-                        ...player,
-                        score: player.initialScore,
-                        currentTurn: [],
-                        turnHistory: [],
-                      }
-                ),
+                players: game.players.map((player) => {
+                  if (player.id === action.payload.roundWinnerId) {
+                    return action.payload.gameStatus === 'completed'
+                      ? { ...player, legsWon: player.legsWon + 1 }
+                      : {
+                          ...player,
+                          currentTurn: [],
+                          turnHistory: [],
+                          score: player.initialScore,
+                          legsWon: player.legsWon + 1,
+                        };
+                  } else {
+                    return {
+                      ...player,
+                      score: player.initialScore,
+                      currentTurn: [],
+                      turnHistory: [],
+                    };
+                  }
+                }),
               }
             : game
         ),

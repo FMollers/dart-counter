@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Home, Users, Settings, BarChart3 } from 'lucide-react';
+import { Home, Users, Settings, Gamepad2 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
 export const Footer = () => {
@@ -22,9 +22,9 @@ export const Footer = () => {
       color: 'text-emerald-500',
     },
     {
-      icon: BarChart3,
-      href: '/statistics',
-      label: 'Statistics',
+      icon: Gamepad2,
+      href: '/games',
+      label: 'Games',
       color: 'text-orange-500',
     },
     {

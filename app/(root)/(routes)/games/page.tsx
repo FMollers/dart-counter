@@ -1,10 +1,14 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { useGamesContext } from '@/context/games-context';
+
 import { cn } from '@/lib/utils';
 
-const StatisticsPage = () => {
+import { Game, useGamesContext } from '@/context/games-context';
+import { useRouter } from 'next/navigation';
+
+const GamesPage = () => {
+  const router = useRouter();
   const { state } = useGamesContext();
 
   const getGameStatusColor = (
@@ -20,15 +24,27 @@ const StatisticsPage = () => {
     }
   };
 
-  console.log(state);
+  const navigateToGame = (game: Game) => {
+    if (game.status !== 'completed') {
+      router.push(`/games/${game.id}`);
+    }
+  };
+
   return (
-    <div className="h-full p-4 space-y-2 w-full py-4">
+    <div className="h-full p-2 space-y-2 w-full">
       <h1 className="text-2xl flex justify-center">Games</h1>
       {state.games.length > 0 ? (
         state.games.map((game) => (
           <Card
             key={game.id}
-            className={cn('w-full border-l-8', getGameStatusColor(game.status))}
+            onClick={() => navigateToGame(game)}
+            className={cn(
+              'w-full border-l-8',
+              getGameStatusColor(game.status),
+              game.status !== 'completed'
+                ? 'cursor-pointer hover:bg-primary/10'
+                : ''
+            )}
           >
             <CardContent>
               <div className="pt-6 grid items-center grid-cols-5">
@@ -66,4 +82,4 @@ const StatisticsPage = () => {
   );
 };
 
-export default StatisticsPage;
+export default GamesPage;

@@ -1,8 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import PlayerList from '@/components/ui/player-list';
-
+import PlayerList from '@/components//player-list';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Dices } from 'lucide-react';
+import AddPlayer from '@/components/add-player';
+
 import { useRouter } from 'next/navigation';
+import { Dices, Tally5 } from 'lucide-react';
+
+import { usePlayersContext } from '@/context/players-context';
+
 import { useState } from 'react';
 import {
   Game,
@@ -21,7 +25,6 @@ import {
   useGamesContext,
 } from '@/context/games-context';
 import { v4 as uuidv4 } from 'uuid';
-import { usePlayersContext } from '@/context/players-context';
 
 const HomePage = () => {
   const [legs, setLegs] = useState<number>(3);
@@ -52,6 +55,7 @@ const HomePage = () => {
     }
   };
 
+  //NEEDS TO BE IMPLEMENTED
   // const randomizePlayers = () => {
   //   const players = [...state.players];
   //   for (let i = players.length - 1; i > 0; i--) {
@@ -68,30 +72,43 @@ const HomePage = () => {
   // };
 
   return (
-    <div className="p-4 grid grid-col-1 gap-4 w-full">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Legs: {legs}</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>Legs</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup
-            value={legs.toString()}
-            onValueChange={(value) => setLegs(Number(value))}
-          >
-            <DropdownMenuRadioItem value="3">3</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <PlayerList />
-      <Button variant="outline" onClick={() => console.log('randomize')}>
-        <Dices className="mr-2 h-4 w-4" /> Randomize
-      </Button>
-      <Button onClick={startGame}>Start game</Button>
-    </div>
+    <>
+      <div className="p-2">
+        <PlayerList />
+      </div>
+      <div className="fixed bottom-0 w-full p-2">
+        <AddPlayer />
+        <div className="grid grid-col-1 md:grid-cols-2 gap-4 mt-4">
+          <Button variant="outline" onClick={() => console.log('randomize')}>
+            <Dices className="mr-2 h-4 w-4" /> Randomize
+          </Button>
+          {/* TODO: MOVE TO SEPERATE COMPONENT */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Tally5 className="mr-2 h-4 w-4" />
+                {legs}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Legs</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={legs.toString()}
+                onValueChange={(value) => setLegs(Number(value))}
+              >
+                <DropdownMenuRadioItem value="3">3</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="2">2</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="1">1</DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <Button className="mt-4 w-full" onClick={startGame}>
+          Start game
+        </Button>
+      </div>
+    </>
   );
 };
 

@@ -83,6 +83,7 @@ export type UpdatePlayerAction = {
     playerId: string;
     score: number;
     checkoutType: CheckoutTypes.DOUBLE_OUT | CheckoutTypes.STRAIGHT_OUT;
+    name: string;
   };
 };
 
@@ -117,6 +118,7 @@ const playersReducer = (
                 ...player,
                 score: action.payload.score,
                 checkoutType: action.payload.checkoutType,
+                name: action.payload.name,
               }
             : player
         ),

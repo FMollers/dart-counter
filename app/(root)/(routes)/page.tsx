@@ -70,11 +70,11 @@ const HomePage = () => {
   };
 
   return (
-    <div className="p-2 mt-4">
+    <>
       <PlayerList />
-      <div className="fixed bottom-0 w-full mb-2">
+      <div className="fixed bottom-0 w-full mb-2 p-2 mt-4">
         <AddPlayer />
-        <div className="grid grid-col-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-2 gap-4 mt-4">
           <Button
             variant={randomize ? 'default' : 'outline'}
             onClick={() => setRandomize(!randomize)}
@@ -88,16 +88,16 @@ const HomePage = () => {
             />
           </Button>
           <Legs legs={legs} handleLegs={handleLegs} />
+          <Button
+            disabled={playerState.players.length < 1}
+            className="col-span-2"
+            onClick={startGame}
+          >
+            Start game
+          </Button>
         </div>
-        <Button
-          disabled={playerState.players.length < 1}
-          className="mt-4 w-full"
-          onClick={startGame}
-        >
-          Start game
-        </Button>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -20,7 +20,7 @@ const PlayerList = () => {
   console.log(expandedCardId);
 
   return (
-    <div className="grid grid-col-1 md:grid-cols-2 gap-4 w-full">
+    <div className="grid grid-col-1 md:grid-cols-2 gap-4 w-full mt-4 p-2">
       {state.players.length > 0 ? (
         state.players.map((player) => (
           <Card

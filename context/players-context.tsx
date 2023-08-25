@@ -30,38 +30,7 @@ export enum PlayerActionTypes {
 }
 
 const initialState: PlayersState = {
-  players: [
-    {
-      id: 'f7a1dd3f-d2d6-450d-9aea-5f074a54b750',
-      name: 'Filip',
-      checkoutType: CheckoutTypes.STRAIGHT_OUT,
-      currentTurn: [],
-      legsWon: 0,
-      score: 401,
-      initialScore: 401,
-      turnHistory: [],
-    },
-    {
-      id: '49b9b576-2987-41a3-bc5a-fe5b4a4f1ddb',
-      name: 'Kalle',
-      checkoutType: CheckoutTypes.DOUBLE_OUT,
-      currentTurn: [],
-      legsWon: 0,
-      score: 501,
-      initialScore: 501,
-      turnHistory: [],
-    },
-    {
-      id: '87b3b912-8321-42y3-bt5i-fe3b4a4f1ddb',
-      name: 'Emma',
-      checkoutType: CheckoutTypes.STRAIGHT_OUT,
-      currentTurn: [],
-      legsWon: 0,
-      score: 301,
-      initialScore: 301,
-      turnHistory: [],
-    },
-  ],
+  players: [],
 };
 
 export type AddPlayerAction = {

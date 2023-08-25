@@ -4,13 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-import {
-  ArrowLeftRight,
-  CircleSlash2,
-  Crosshair,
-  Keyboard,
-  Tally5,
-} from 'lucide-react';
+import { CircleSlash2, Crosshair, Keyboard, Tally5 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -40,7 +34,6 @@ const GameClient = ({ game }: GameClientProps) => {
   const [multiplier, setMultiplier] = useState<1 | 2 | 3>(1);
   const [winner, setWinner] = useState<Player>();
 
-  //TODO: WHEN SWITCHING KEYBOARD, CLEAR STATE
   const [keyboardType, setKeyboardType] = useState<KeyboardTypes>(
     KeyboardTypes.ADVANCED
   );
@@ -139,26 +132,36 @@ const GameClient = ({ game }: GameClientProps) => {
           },
         });
       } else {
-        const previousPlayer = getPreviousPlayer(currentPlayer);
-
         if (
-          previousPlayer.currentTurn.length === 3 ||
-          previousPlayer.currentTurn.at(-1)?.isBust
+          game.players.every((player) => player.currentTurn.length < 1) &&
+          game.rounds.length > 0
         ) {
           dispatch({
-            type: GameActionTypes.PREVIOUS_PLAYER,
-            payload: {
-              currentPlayerId: currentPlayer.id,
-              gameId: game.id,
-              previousPlayerId: previousPlayer.id,
-            },
+            type: GameActionTypes.REVERT_LAST_ROUND,
+            payload: { gameId: game.id },
           });
+        } else {
+          const previousPlayer = getPreviousPlayer(currentPlayer);
+
+          if (
+            previousPlayer.currentTurn.length === 3 ||
+            previousPlayer.currentTurn.at(-1)?.isBust
+          ) {
+            dispatch({
+              type: GameActionTypes.PREVIOUS_PLAYER,
+              payload: {
+                gameId: game.id,
+                currentPlayerId: currentPlayer.id,
+                previousPlayerId: previousPlayer.id,
+              },
+            });
+          }
         }
       }
     }
   };
 
-  const getPreviousPlayer = (currentPlayer: Player) => {
+  const getPreviousPlayer = (currentPlayer: Player): Player => {
     const currentPlayerIndex = game.players.findIndex(
       (player) => player.id === currentPlayer.id
     );
@@ -170,7 +173,7 @@ const GameClient = ({ game }: GameClientProps) => {
     return previousPlayer;
   };
 
-  const getNextPlayer = (currentPlayer: Player) => {
+  const getNextPlayer = (currentPlayer: Player): Player => {
     const currentPlayerIndex = game.players.findIndex(
       (player) => player.id === currentPlayer.id
     );
@@ -180,18 +183,23 @@ const GameClient = ({ game }: GameClientProps) => {
     return nextPlayer;
   };
 
-  const calculateAveragePoints = (throws: DartThrow[]): string => {
-    const validThrows = throws.filter((dartThrow) => dartThrow.score > 0);
+  const calculateAveragePoints = (
+    throws: DartThrow[],
+    turnHistory: DartThrow[][]
+  ): string => {
+    const allThrows = [...(turnHistory ? turnHistory.flat() : []), ...throws];
 
-    if (validThrows.length === 0) {
+    if (allThrows.length === 0) {
       return '0';
     }
 
-    const totalPoints = validThrows.reduce(
+    const totalPoints = allThrows.reduce(
       (total, dartThrow) => total + dartThrow.score,
       0
     );
-    const average = totalPoints / validThrows.length;
+
+    const totalDartsThrown = allThrows.length;
+    const average = (totalPoints / totalDartsThrown) * 3;
 
     return average.toFixed(2);
   };
@@ -199,7 +207,7 @@ const GameClient = ({ game }: GameClientProps) => {
   const calculateTotalDartsThrown = (
     currentTurn: DartThrow[],
     turnHistory: DartThrow[][]
-  ) => {
+  ): number => {
     const totalCurrentTurnDarts = currentTurn.length;
     const totalPreviousTurnsDarts = turnHistory.reduce(
       (total, turn) => total + turn.length,
@@ -269,7 +277,10 @@ const GameClient = ({ game }: GameClientProps) => {
                   <Tally5 className="ml-2" />
                 </div>
                 <div className="flex justify-end">
-                  {calculateAveragePoints(winner.currentTurn)}
+                  {calculateAveragePoints(
+                    winner.currentTurn,
+                    winner.turnHistory
+                  )}
                   <CircleSlash2 className="ml-2" />
                 </div>
                 <div className="flex justify-end">
@@ -295,24 +306,21 @@ const GameClient = ({ game }: GameClientProps) => {
                   : 'border-l-primary'
               )}
             >
-              <CardContent className="pt-6 grid grid-cols-3 gap-4">
-                <div>
+              <CardContent className="pt-6 grid grid-cols-4 gap-4">
+                <div className="col-span-1">
                   <div
                     className={cn(
-                      'text-3xl',
+                      'text-2xl',
                       player.score <= 170 && 'text-green-500'
                     )}
                   >
-                    {player.score < 0 ? 0 : player.score}
+                    {player.score}
                   </div>
                   <div className="overflow-hidden">{player.name}</div>
-                  <Badge className="overflow-hidden">
-                    {player.checkoutType}
-                  </Badge>
                 </div>
-                <div className="grid grid-cols-3 gap-6 items-center">
-                  {player.currentTurn.length ? (
-                    player.currentTurn.map((turn, index) => (
+                <div className="col-span-2">
+                  <div className="grid grid-cols-3 gap-1 items-center">
+                    {[...Array(3)].map((_, index) => (
                       <Button
                         key={index}
                         disabled
@@ -324,39 +332,40 @@ const GameClient = ({ game }: GameClientProps) => {
                             : ''
                         )}
                       >
-                        {turn.score}
+                        {player.currentTurn.length > index
+                          ? player.currentTurn[index].score
+                          : ''}
                       </Button>
-                    ))
-                  ) : (
-                    <>
-                      <Button disabled variant="secondary"></Button>
-                      <Button disabled variant="secondary"></Button>
-                      <Button disabled variant="secondary"></Button>
-                    </>
-                  )}
-                  <Button
-                    disabled
-                    variant="ghost"
-                    className="col-span-3 flex justify-center"
-                  >
-                    {calculateCurrentTurnPoints(player.currentTurn)}
-                  </Button>
+                    ))}
+                    <Button
+                      disabled
+                      variant="ghost"
+                      className="col-span-3 flex justify-center"
+                    >
+                      {calculateCurrentTurnPoints(player.currentTurn)}
+                    </Button>
+                  </div>
                 </div>
-                <div className="grid grid-rows-3 gap-2 items-center">
-                  <div className="flex justify-end">
-                    {player.legsWon}/{game.legsToWin}
-                    <Tally5 className="ml-2" />
-                  </div>
-                  <div className="flex justify-end">
-                    {calculateAveragePoints(player.currentTurn)}
-                    <CircleSlash2 className="ml-2" />
-                  </div>
-                  <div className="flex justify-end">
-                    {calculateTotalDartsThrown(
-                      player.currentTurn,
-                      player.turnHistory
-                    )}
-                    <Crosshair className="ml-2" />
+                <div className="col-span-1">
+                  <div className="grid grid-rows-3 gap-2 items-center">
+                    <div className="flex justify-end">
+                      {player.legsWon}/{game.legsToWin}
+                      <Tally5 className="ml-2" />
+                    </div>
+                    <div className="flex justify-end">
+                      {calculateAveragePoints(
+                        player.currentTurn,
+                        player.turnHistory
+                      )}
+                      <CircleSlash2 className="ml-2" />
+                    </div>
+                    <div className="flex justify-end">
+                      {calculateTotalDartsThrown(
+                        player.currentTurn,
+                        player.turnHistory
+                      )}
+                      <Crosshair className="ml-2" />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -367,9 +376,8 @@ const GameClient = ({ game }: GameClientProps) => {
       <Button
         onClick={handleKeyboardSwitch}
         variant="secondary"
-        className="fixed bottom-60 right-0 z-50 p-6 rounded-b-none rounded-r-none hover:text-secondary hover:bg-primary"
+        className="fixed bottom-52 right-4 z-50 rounded-b-none hover:text-secondary hover:bg-primary"
       >
-        <ArrowLeftRight />
         <Keyboard />
       </Button>
       {keyboardType === KeyboardTypes.STANDARD ? (

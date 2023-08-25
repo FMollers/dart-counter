@@ -17,6 +17,8 @@ const PlayerList = () => {
     setExpandedCardId(playerId);
   };
 
+  console.log(expandedCardId);
+
   return (
     <div className="grid grid-col-1 md:grid-cols-2 gap-4 w-full">
       {state.players.length > 0 ? (
@@ -27,7 +29,7 @@ const PlayerList = () => {
               expandedCardId === player.id ? 'h-80' : 'hover:bg-primary/10'
             )}
             key={player.id}
-            onClick={() => setExpandedCardId(player.id)}
+            onClick={() => !expandedCardId && setExpandedCardId(player.id)}
           >
             <CardContent>
               <div className="pt-8 grid grid-cols-3 gap-4">

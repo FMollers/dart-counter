@@ -3,12 +3,19 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { CheckoutTypes, Player } from './players-context';
 
+export type Round = {
+  roundNumber: number;
+  roundWinnerId: string;
+  players: Player[];
+};
+
 export type Game = {
   id: string;
   status: 'paused' | 'completed' | 'in progress';
   legsToWin: number;
   players: Player[];
   currentPlayerId: string;
+  rounds: Round[];
 };
 
 export type DartThrow = {
@@ -60,6 +67,7 @@ const initialState: GamesState = {
           turnHistory: [],
         },
       ],
+      rounds: [],
     },
     {
       id: '37e29b7b-a4a8-4791-a34c-e8a57fe45112',
@@ -98,6 +106,7 @@ const initialState: GamesState = {
           turnHistory: [],
         },
       ],
+      rounds: [],
     },
   ],
 };
@@ -110,11 +119,16 @@ export enum GameActionTypes {
   PREVIOUS_PLAYER = 'PREVIOUS_PLAYER',
   UPDATE_GAME = 'UPDATE_GAME',
   END_GAME = 'END_GAME',
+  PAUSE_GAME = 'PAUSE_GAME',
+  REVERT_LAST_ROUND = 'REVERT_LAST_ROUND',
+  DELETE_GAME = 'DELETE_GAME',
 }
 
 export type AddGameAction = {
   type: GameActionTypes.ADD_GAME;
-  payload: Game;
+  payload: {
+    game: Game;
+  };
 };
 
 export type AddThrowAction = {
@@ -168,21 +182,74 @@ export type EndGameAction = {
   };
 };
 
+export type PauseGameAction = {
+  type: GameActionTypes.PAUSE_GAME;
+  payload: {
+    gameId: string;
+  };
+};
+
+export type DeleteGameAction = {
+  type: GameActionTypes.DELETE_GAME;
+  payload: {
+    gameId: string;
+  };
+};
+
+export type RevertLastRound = {
+  type: GameActionTypes.REVERT_LAST_ROUND;
+  payload: {
+    gameId: string;
+  };
+};
+
 export type GameAction =
   | AddGameAction
+  | PauseGameAction
+  | EndGameAction
+  | DeleteGameAction
   | AddThrowAction
   | UndoThrowsAction
   | NextPlayerAction
   | PreviousPlayerAction
   | UpdateGameAction
-  | EndGameAction;
+  | RevertLastRound;
 
 const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
   switch (action.type) {
     case GameActionTypes.ADD_GAME:
       return {
         ...state,
-        games: [...state.games, action.payload],
+        games: [...state.games, action.payload.game],
+      };
+    case GameActionTypes.PAUSE_GAME:
+      return {
+        ...state,
+        games: state.games.map((game) =>
+          game.id === action.payload.gameId
+            ? {
+                ...game,
+                status: 'paused',
+              }
+            : game
+        ),
+      };
+    case GameActionTypes.END_GAME:
+      return {
+        ...state,
+        games: state.games.map((game) =>
+          game.id === action.payload.gameId
+            ? {
+                ...game,
+                status: 'completed',
+              }
+            : game
+        ),
+      };
+    case GameActionTypes.DELETE_GAME:
+      return {
+        ...state,
+        games: state.games.filter((game) => game.id !== action.payload.gameId),
       };
     case GameActionTypes.ADD_THROW:
       return {
@@ -243,11 +310,15 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
                     ? {
                         ...player,
                         currentTurn:
-                          player.currentTurn.length === 3
+                          player.currentTurn.length === 3 ||
+                          player.currentTurn[player.currentTurn.length - 1]
+                            ?.isBust
                             ? []
                             : player.currentTurn,
                         turnHistory:
-                          player.currentTurn.length === 3
+                          player.currentTurn.length === 3 ||
+                          player.currentTurn[player.currentTurn.length - 1]
+                            ?.isBust
                             ? [...player.turnHistory, [...player.currentTurn]]
                             : player.turnHistory,
                       }
@@ -323,6 +394,18 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
           game.id === action.payload.gameId
             ? {
                 ...game,
+                rounds: [
+                  ...game.rounds,
+                  {
+                    roundNumber: game.rounds.length,
+                    roundWinnerId: action.payload.roundWinnerId,
+                    players: game.players.map((player) =>
+                      player.id === action.payload.roundWinnerId
+                        ? { ...player, legsWon: player.legsWon + 1 }
+                        : { ...player }
+                    ),
+                  },
+                ],
                 status: action.payload.gameStatus,
                 currentPlayerId: game.players[0].id,
                 players: game.players.map((player) => {
@@ -331,8 +414,8 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
                       ? { ...player, legsWon: player.legsWon + 1 }
                       : {
                           ...player,
-                          currentTurn: [],
                           turnHistory: [],
+                          currentTurn: [],
                           score: player.initialScore,
                           legsWon: player.legsWon + 1,
                         };
@@ -340,8 +423,8 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
                     return {
                       ...player,
                       score: player.initialScore,
-                      currentTurn: [],
                       turnHistory: [],
+                      currentTurn: [],
                     };
                   }
                 }),
@@ -349,14 +432,23 @@ const gamesReducer = (state: GamesState, action: GameAction): GamesState => {
             : game
         ),
       };
-    case GameActionTypes.END_GAME:
+    case GameActionTypes.REVERT_LAST_ROUND:
       return {
         ...state,
         games: state.games.map((game) =>
           game.id === action.payload.gameId
             ? {
                 ...game,
-                status: 'completed',
+                currentPlayerId:
+                  game.rounds[game.rounds.length - 1].roundWinnerId,
+                players: game.rounds[game.rounds.length - 1].players.map(
+                  (player) =>
+                    player.id ===
+                    game.rounds[game.rounds.length - 1].roundWinnerId
+                      ? { ...player, legsWon: player.legsWon - 1 }
+                      : { ...player }
+                ),
+                rounds: game.rounds.slice(0, -1),
               }
             : game
         ),

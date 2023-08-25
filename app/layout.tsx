@@ -1,7 +1,8 @@
-import { ThemeProvider } from '@/components/ui/theme-provider';
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+
+import { ThemeProvider } from '@/components/ui/theme-provider';
 import { GamesProvider } from '@/context/games-context';
 import { PlayersProvider } from '@/context/players-context';
 
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        {/* TODO: LOOK INTO TWO PROVIDERS WRAPPING EACHOTHER */}
         <GamesProvider>
           <PlayersProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

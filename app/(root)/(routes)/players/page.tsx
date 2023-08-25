@@ -5,9 +5,9 @@ import PlayerList from '@/components/player-list';
 
 const PlayersPage = () => {
   return (
-    <div className="p-2 flex justify-center">
+    <div className="p-2 mt-4 flex justify-center">
       <PlayerList />
-      <div className="fixed bottom-0 w-full p-2">
+      <div className="fixed bottom-0 w-full p-2 mb-2">
         <AddPlayer />
       </div>
     </div>

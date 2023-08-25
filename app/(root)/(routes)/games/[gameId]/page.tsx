@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import GameClient from './components/client';
 import { useGamesContext } from '@/context/games-context';
 
+//TODO: SHOULD BE SERVER CLIENT SINCE DATA SHOULD BE FETCHED FROM DATABASE
+
 interface GameIdPageProps {
   params: {
     gameId: string;

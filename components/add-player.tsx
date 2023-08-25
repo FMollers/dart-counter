@@ -67,8 +67,13 @@ const AddPlayer = () => {
     >
       <CardContent>
         <div className="flex justify-center items-center text-sm p-2">
-          <Plus className="mr-2 h-4 w-4" />
           Add player
+          <Plus
+            className={cn(
+              'ml-2 h-5 w-5 transition-all ease-in-out duration-500',
+              expandCard ? 'transform rotate-180' : ''
+            )}
+          />
         </div>
         <div className="pt-6 grid grid-rows-3 grid-flow-col gap-4">
           <Input
@@ -119,6 +124,7 @@ const AddPlayer = () => {
             <User />
           </div>
           <Button
+            disabled={!name}
             onClick={(e) => {
               e.stopPropagation();
               addPlayer();

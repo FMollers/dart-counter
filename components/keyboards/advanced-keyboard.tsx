@@ -16,8 +16,8 @@ const AdvancedKeyboard = ({
   undoThrows,
 }: AdvancedKeyboardProps) => {
   return (
-    <div className="fixed bottom-0 w-full bg-secondary p-4 border-t-2 border-primary">
-      <div className="grid grid-cols-7 gap-4">
+    <div className="fixed bottom-0 w-full bg-secondary p-2 pb-4">
+      <div className="grid grid-cols-7 gap-2">
         <Button
           variant="default"
           className="col-span-1"

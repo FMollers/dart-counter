@@ -4,12 +4,14 @@ import { Card, CardContent } from '@/components/ui/card';
 
 import { cn } from '@/lib/utils';
 
-import { Game, useGamesContext } from '@/context/games-context';
-import { useRouter } from 'next/navigation';
+import { useGamesContext } from '@/context/games-context';
+import { useState } from 'react';
+import UpdateGame from '@/components/update-game';
 
 const GamesPage = () => {
-  const router = useRouter();
   const { state } = useGamesContext();
+
+  const [expandedCardId, setExpandedCardId] = useState<string>('');
 
   const getGameStatusColor = (
     gameStatus: 'paused' | 'completed' | 'in progress'
@@ -24,59 +26,62 @@ const GamesPage = () => {
     }
   };
 
-  const navigateToGame = (game: Game) => {
-    if (game.status !== 'completed') {
-      router.push(`/games/${game.id}`);
-    }
+  const handleExpandedCard = (gameId: string) => {
+    setExpandedCardId(gameId);
   };
 
   return (
-    <div className="h-full p-2 space-y-2 w-full">
-      <h1 className="text-2xl flex justify-center">Games</h1>
+    <div className="h-full mt-2 p-2 space-y-4 w-full">
+      <h1 className="text-2xl flex justify-center">GAMES</h1>
       {state.games.length > 0 ? (
         state.games.map((game) => (
           <Card
             key={game.id}
-            onClick={() => navigateToGame(game)}
+            onClick={() => setExpandedCardId(game.id)}
             className={cn(
-              'w-full border-l-8',
-              getGameStatusColor(game.status),
-              game.status !== 'completed'
-                ? 'cursor-pointer hover:bg-primary/10'
-                : ''
+              'border-l-8 cursor-pointer',
+              expandedCardId === game.id ? '' : 'hover:bg-primary/10',
+              getGameStatusColor(game.status)
             )}
           >
             <CardContent>
-              <div className="pt-6 grid items-center grid-cols-5">
-                <p className="font-bold">Players</p>
-                <p className="font-bold">Score</p>
-                <p className="font-bold">Legs</p>
-                <p className="font-bold">Checkout Type</p>
-                <p className="font-bold">Average</p>
+              <div className="pt-6 grid grid-cols-4">
+                <p>Player</p>
+                <p>Score</p>
+                <p>Legs</p>
+                <p>Checkout Type</p>
               </div>
               <div
                 className={cn(
-                  'grid pt-6 gap-4 items-center',
+                  'grid pt-4 gap-4 items-center',
                   `grid-rows-${game.players.length}`
                 )}
               >
                 {game.players.map((player) => (
-                  <div key={player.id} className="grid grid-cols-5">
+                  <div key={player.id} className="grid grid-cols-4">
                     <p>{player.name}</p>
                     <p>{player.score}</p>
                     <p>
                       {player.legsWon}/{game.legsToWin}
                     </p>
                     <p>{player.checkoutType}</p>
-                    <p></p>
                   </div>
                 ))}
               </div>
+              {expandedCardId === game.id && (
+                <UpdateGame
+                  game={game}
+                  expandedCardId={expandedCardId}
+                  handleExpandedCard={handleExpandedCard}
+                />
+              )}
             </CardContent>
           </Card>
         ))
       ) : (
-        <div className="flex justify-center">No games to display</div>
+        <div className="flex justify-center items-center">
+          No games to display
+        </div>
       )}
     </div>
   );

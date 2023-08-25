@@ -27,7 +27,6 @@ export enum PlayerActionTypes {
   ADD_PLAYER = 'ADD_PLAYER',
   REMOVE_PLAYER = 'REMOVE_PLAYER',
   UPDATE_PLAYER = 'UPDATE_PLAYER',
-  // Add more action types as needed
 }
 
 const initialState: PlayersState = {
@@ -117,6 +116,7 @@ const playersReducer = (
             ? {
                 ...player,
                 score: action.payload.score,
+                initialScore: action.payload.score,
                 checkoutType: action.payload.checkoutType,
                 name: action.payload.name,
               }

@@ -19,6 +19,7 @@ import { Player } from '@/context/players-context';
 import { useEffect, useState } from 'react';
 import StandardKeyboard from '@/components/keyboards/standard-keyboard';
 import AdvancedKeyboard from '@/components/keyboards/advanced-keyboard';
+import { checkoutOptions } from '@/app/helpers/checkout-helper';
 
 interface GameClientProps {
   game: Game;
@@ -238,6 +239,25 @@ const GameClient = ({ game }: GameClientProps) => {
     );
   };
 
+  const getScoreColor = (score: number) => {
+    if (score <= 170) {
+      switch (score) {
+        case 169:
+        case 168:
+        case 166:
+        case 165:
+        case 163:
+        case 162:
+        case 159:
+          return 'text-red-500';
+        default:
+          return 'text-green-500';
+      }
+    } else {
+      return '';
+    }
+  };
+
   useEffect(() => {
     if (game.status === 'completed') {
       const dartWinner = game.players.find(
@@ -308,12 +328,7 @@ const GameClient = ({ game }: GameClientProps) => {
             >
               <CardContent className="pt-4 grid grid-cols-4 gap-2">
                 <div className="col-span-1">
-                  <div
-                    className={cn(
-                      'text-2xl',
-                      player.score <= 170 && 'text-green-500'
-                    )}
-                  >
+                  <div className={cn('text-2xl', getScoreColor(player.score))}>
                     {player.score}
                   </div>
                   <div className="overflow-hidden">{player.name}</div>
@@ -367,6 +382,19 @@ const GameClient = ({ game }: GameClientProps) => {
                       <Crosshair className="ml-2" />
                     </div>
                   </div>
+                </div>
+                <div className="fixed bottom-48 flex justify-between left-2 z-50 w-44">
+                  {game.currentPlayerId === player.id &&
+                    checkoutOptions[player.score] &&
+                    checkoutOptions[player.score].map((option, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="text-sm border-2 border-primary"
+                      >
+                        {option}
+                      </Badge>
+                    ))}
                 </div>
               </CardContent>
             </Card>

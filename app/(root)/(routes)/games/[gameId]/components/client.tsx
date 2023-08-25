@@ -380,6 +380,13 @@ const GameClient = ({ game }: GameClientProps) => {
       >
         <Keyboard />
       </Button>
+      <Button
+        onClick={handleKeyboardSwitch}
+        variant="secondary"
+        className="fixed bottom-48 left-2 z-50 rounded-full hover:text-secondary hover:bg-primary"
+      >
+        <Keyboard />
+      </Button>
       {keyboardType === KeyboardTypes.STANDARD ? (
         <StandardKeyboard
           multiplier={multiplier}

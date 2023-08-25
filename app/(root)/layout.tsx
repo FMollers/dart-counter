@@ -8,7 +8,7 @@ const HomeLayout = async ({ children }: { children: React.ReactNode }) => {
       <div className="hidden h-full inset-y-0 z-[80]">
         <Sidebar />
       </div>
-      <main className="pt-16 h-full">{children}</main>
+      <main className="pt-14 h-full">{children}</main>
     </div>
   );
 };

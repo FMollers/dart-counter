@@ -50,6 +50,9 @@ const AddPlayer = () => {
       },
     });
 
+    setName('');
+    setScore(501);
+    setCheckoutType(CheckoutTypes.DOUBLE_OUT);
     setExpandCard(false);
   };
 
@@ -60,7 +63,7 @@ const AddPlayer = () => {
   return (
     <Card
       className={cn(
-        'cursor-pointer h-10 transition-all duration-700 ease-in-out overflow-hidden',
+        'cursor-pointer h-10 transition-all duration-500 ease-in-out overflow-hidden',
         expandCard ? 'h-52' : 'hover:bg-primary/10'
       )}
       onClick={() => setExpandCard(true)}
@@ -75,7 +78,12 @@ const AddPlayer = () => {
             )}
           />
         </div>
-        <div className="pt-4 grid grid-rows-3 grid-flow-col gap-2">
+        <div
+          className={cn(
+            'mt-4 grid grid-rows-3 grid-flow-col gap-2',
+            expandCard ? '' : 'hidden'
+          )}
+        >
           <Input
             placeholder="Name"
             value={name}

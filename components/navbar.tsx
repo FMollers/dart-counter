@@ -8,7 +8,7 @@ import Sidebar from '@/components/sidebar';
 
 export const Navbar = () => {
   return (
-    <div className="fixed w-full z-50 flex justify-between items-center py-6 px-4 border-primary/10 bg-secondary h-16">
+    <div className="fixed w-full z-50 flex justify-between items-center py-6 px-4 border-primary/10 bg-secondary h-12">
       <div className="flex items-center">
         <Sheet>
           <SheetTrigger className="pr-4">

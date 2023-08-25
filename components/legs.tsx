@@ -40,8 +40,10 @@ const Legs = ({ legs, handleLegs }: LegsProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          Legs
-          {getLegsIcon()}
+          <div className="flex">
+            Legs
+            {getLegsIcon()}
+          </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

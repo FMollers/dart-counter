@@ -17,17 +17,15 @@ const PlayerList = () => {
     setExpandedCardId(playerId);
   };
 
-  console.log(expandedCardId);
-
   return (
     <>
       {state.players.length > 0 ? (
-        <div className="grid grid-col-1 md:grid-cols-2 gap-2 w-full p-2 mb-40">
+        <div className="grid grid-col-1 md:grid-cols-2 gap-2 p-2 w-full mb-40">
           {state.players.map((player) => (
             <Card
               className={cn(
-                'overflow-hidden h-24 transition-all duration-700 ease-in-out cursor-pointer',
-                expandedCardId === player.id ? 'h-80' : 'hover:bg-primary/10'
+                'overflow-hidden h-24 transition-all duration-500 ease-in-out cursor-pointer',
+                expandedCardId === player.id ? 'h-72' : 'hover:bg-primary/10'
               )}
               key={player.id}
               onClick={() => !expandedCardId && setExpandedCardId(player.id)}
@@ -58,7 +56,7 @@ const PlayerList = () => {
           ))}
         </div>
       ) : (
-        <div className="flex justify-center mt-2">No players added</div>
+        <div className="flex justify-center">No players added</div>
       )}
     </>
   );

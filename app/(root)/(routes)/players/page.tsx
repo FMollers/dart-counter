@@ -5,7 +5,7 @@ import PlayerList from '@/components/player-list';
 
 const PlayersPage = () => {
   return (
-    <div className="p-2 flex justify-center">
+    <div className="flex justify-center">
       <PlayerList />
       <div className="fixed bottom-0 w-full p-2 bg-secondary rounded-tl-sm rounded-tr-sm">
         <AddPlayer />

@@ -60,8 +60,8 @@ const AddPlayer = () => {
   return (
     <Card
       className={cn(
-        'cursor-pointer h-10 transition-all duration-700 ease-in-out overflow-hidden mt-4',
-        expandCard ? 'h-60' : 'hover:bg-primary/10'
+        'cursor-pointer h-10 transition-all duration-700 ease-in-out overflow-hidden',
+        expandCard ? 'h-52' : 'hover:bg-primary/10'
       )}
       onClick={() => setExpandCard(true)}
     >
@@ -75,7 +75,7 @@ const AddPlayer = () => {
             )}
           />
         </div>
-        <div className="pt-6 grid grid-rows-3 grid-flow-col gap-4">
+        <div className="pt-4 grid grid-rows-3 grid-flow-col gap-2">
           <Input
             placeholder="Name"
             value={name}

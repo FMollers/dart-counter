@@ -39,9 +39,9 @@ const UpdateGame = ({
 
   return (
     <Card
-      className={cn('mt-6', expandedCardId === game.id ? 'block' : 'hidden')}
+      className={cn('mt-3', expandedCardId === game.id ? 'block' : 'hidden')}
     >
-      <CardContent className="pt-6 grid grid-cols-4 gap-4">
+      <CardContent className="pt-6 grid grid-cols-4 gap-1">
         <Button
           className={game.status === 'completed' ? 'col-span-2' : ''}
           onClick={(e) => {

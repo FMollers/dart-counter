@@ -252,10 +252,10 @@ const GameClient = ({ game }: GameClientProps) => {
   return (
     <div>
       {winner ? (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
           <h1 className="flex justify-center text-2xl">WINNER</h1>
           <Card>
-            <CardContent className="pt-6 grid grid-cols-3 gap-4">
+            <CardContent className="pt-2 grid grid-cols-3 gap-4">
               <div>
                 <div
                   className={cn(
@@ -295,7 +295,7 @@ const GameClient = ({ game }: GameClientProps) => {
           </Card>
         </div>
       ) : (
-        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 p-4 mb-72">
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 p-2 mb-72">
           {game.players.map((player) => (
             <Card
               key={player.id}
@@ -306,7 +306,7 @@ const GameClient = ({ game }: GameClientProps) => {
                   : 'border-l-primary'
               )}
             >
-              <CardContent className="pt-6 grid grid-cols-4 gap-4">
+              <CardContent className="pt-4 grid grid-cols-4 gap-2">
                 <div className="col-span-1">
                   <div
                     className={cn(
@@ -376,7 +376,7 @@ const GameClient = ({ game }: GameClientProps) => {
       <Button
         onClick={handleKeyboardSwitch}
         variant="secondary"
-        className="fixed bottom-52 right-4 z-50 rounded-b-none hover:text-secondary hover:bg-primary"
+        className="fixed bottom-48 right-2 z-50 rounded-full hover:text-secondary hover:bg-primary"
       >
         <Keyboard />
       </Button>

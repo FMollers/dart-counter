@@ -20,43 +20,47 @@ const PlayerList = () => {
   console.log(expandedCardId);
 
   return (
-    <div className="grid grid-col-1 md:grid-cols-2 gap-4 w-full mt-4 p-2">
+    <>
       {state.players.length > 0 ? (
-        state.players.map((player) => (
-          <Card
-            className={cn(
-              'overflow-hidden h-24 transition-all duration-700 ease-in-out cursor-pointer',
-              expandedCardId === player.id ? 'h-80' : 'hover:bg-primary/10'
-            )}
-            key={player.id}
-            onClick={() => !expandedCardId && setExpandedCardId(player.id)}
-          >
-            <CardContent>
-              <div className="pt-8 grid grid-cols-3 gap-4">
-                <div className="flex justify-start items-center">
-                  <div className="text-2xl overflow-hidden">{player.name}</div>
-                </div>
-                <div className="flex justify-center items-center">
-                  <Badge className="overflow-hidden">{player.score}</Badge>
-                </div>
-                <div className="flex justify-end items-center">
-                  {player.checkoutType}
-                </div>
-              </div>
-              {expandedCardId === player.id && (
-                <UpdatePlayer
-                  player={player}
-                  expandedCardId={expandedCardId}
-                  handleExpandedCard={handleExpandedCard}
-                />
+        <div className="grid grid-col-1 md:grid-cols-2 gap-2 w-full p-2 mb-40">
+          {state.players.map((player) => (
+            <Card
+              className={cn(
+                'overflow-hidden h-24 transition-all duration-700 ease-in-out cursor-pointer',
+                expandedCardId === player.id ? 'h-80' : 'hover:bg-primary/10'
               )}
-            </CardContent>
-          </Card>
-        ))
+              key={player.id}
+              onClick={() => !expandedCardId && setExpandedCardId(player.id)}
+            >
+              <CardContent>
+                <div className="pt-8 grid grid-cols-3 gap-4">
+                  <div className="flex justify-start items-center">
+                    <div className="text-2xl overflow-hidden">
+                      {player.name}
+                    </div>
+                  </div>
+                  <div className="flex justify-center items-center">
+                    <Badge className="overflow-hidden">{player.score}</Badge>
+                  </div>
+                  <div className="flex justify-end items-center">
+                    {player.checkoutType}
+                  </div>
+                </div>
+                {expandedCardId === player.id && (
+                  <UpdatePlayer
+                    player={player}
+                    expandedCardId={expandedCardId}
+                    handleExpandedCard={handleExpandedCard}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : (
-        <div className="flex justify-center">No players yet</div>
+        <div className="flex justify-center mt-2">No players added</div>
       )}
-    </div>
+    </>
   );
 };
 

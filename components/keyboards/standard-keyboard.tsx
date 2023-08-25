@@ -27,9 +27,9 @@ const StandardKeyboard = ({
   };
 
   return (
-    <div className="fixed bottom-0 w-full bg-secondary p-2 pb-4">
-      <div className="grid grid-cols-2 gap-3 w-full">
-        <div className="grid grid-rows-4 grid-cols-3 gap-2">
+    <div className="fixed bottom-0 w-full bg-secondary p-1">
+      <div className="grid grid-cols-2 gap-1 w-full">
+        <div className="grid grid-rows-4 grid-cols-3 gap-1">
           <Button
             variant="default"
             className="col-span-1"
@@ -102,14 +102,14 @@ const StandardKeyboard = ({
             0
           </Button>
         </div>
-        <div className="grid grid-rows-2 grid-cols-2 gap-2">
+        <div className="grid grid-rows-2 grid-cols-2 gap-1">
           <Button
             variant="ghost"
             onClick={() => setThrowScore(throwScore.slice(0, -1))}
-            className="row-span-1 col-span-2 text-primary hover:text-destructive text-2xl overflow-hidden flex justify-between h-full bg-transparent border-4 border-dotted border-primary"
+            className="row-span-1 col-span-2 text-primary text-2xl overflow-hidden flex justify-between h-full bg-transparent border-4 border-dotted border-primary"
           >
             {throwScore}
-            {throwScore && <Delete />}
+            {throwScore && <Delete className="text-destructive" />}
           </Button>
           <Button
             variant="destructive"

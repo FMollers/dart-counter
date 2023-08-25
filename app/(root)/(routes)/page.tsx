@@ -72,9 +72,9 @@ const HomePage = () => {
   return (
     <>
       <PlayerList />
-      <div className="fixed bottom-0 w-full mb-2 p-2 mt-4">
+      <div className="fixed bottom-0 w-full p-2 bg-secondary rounded-tl-sm rounded-tr-sm">
         <AddPlayer />
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-2 gap-2 mt-2">
           <Button
             variant={randomize ? 'default' : 'outline'}
             onClick={() => setRandomize(!randomize)}

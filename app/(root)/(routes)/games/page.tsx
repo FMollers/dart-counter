@@ -31,7 +31,7 @@ const GamesPage = () => {
   };
 
   return (
-    <div className="h-full mt-2 p-2 space-y-4 w-full">
+    <div className="h-full p-2 space-y-2 w-full">
       <h1 className="text-2xl flex justify-center">GAMES</h1>
       {state.games.length > 0 ? (
         state.games.map((game) => (
@@ -45,7 +45,7 @@ const GamesPage = () => {
             )}
           >
             <CardContent>
-              <div className="pt-6 grid grid-cols-4">
+              <div className="pt-4 grid grid-cols-4">
                 <p>Player</p>
                 <p>Score</p>
                 <p>Legs</p>
@@ -53,7 +53,7 @@ const GamesPage = () => {
               </div>
               <div
                 className={cn(
-                  'grid pt-4 gap-4 items-center',
+                  'grid pt-4 gap-2 items-center',
                   `grid-rows-${game.players.length}`
                 )}
               >
